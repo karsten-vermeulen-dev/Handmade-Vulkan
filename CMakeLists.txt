@@ -6,12 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(INCLUDE_FILES 
 ${CMAKE_SOURCE_DIR}/src/Input.h
-${CMAKE_SOURCE_DIR}/src/Screen.h)
+${CMAKE_SOURCE_DIR}/src/Screen.h
+${CMAKE_SOURCE_DIR}/src/Utility.h)
 
 set(SOURCE_FILES 
 ${CMAKE_SOURCE_DIR}/src/Input.cpp
 ${CMAKE_SOURCE_DIR}/src/Main.cpp
-${CMAKE_SOURCE_DIR}/src/Screen.cpp)
+${CMAKE_SOURCE_DIR}/src/Screen.cpp
+${CMAKE_SOURCE_DIR}/src/Utility.cpp)
 
 add_executable(Handmade ${INCLUDE_FILES} ${SOURCE_FILES})
 

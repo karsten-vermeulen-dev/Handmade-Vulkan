@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Input.h"
 #include "Screen.h"
+#include "Utility.h"
 
 int main()
 {
@@ -8,10 +9,12 @@ int main()
 
 	if (!Screen::Instance()->Initialize())
 	{
+		Utility::Log("Application did not initialize properly.");
+		system("pause");
 		return 0;
 	}
-	
-	std::cout << "Hello Vulkan!" << std::endl;
+
+	Utility::Log("Hello Vulkan!");
 
 	while (isAppRunning)
 	{

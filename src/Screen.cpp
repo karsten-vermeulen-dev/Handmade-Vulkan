@@ -5,6 +5,7 @@
 
 #include "Input.h"
 #include "Screen.h"
+#include "Utility.h"
 
 #include <iostream>
 
@@ -43,15 +44,13 @@ bool Screen::Initialize()
 	
 	if (glfwInit() == GLFW_FALSE)
 	{
-		std::cout << "GLFW did not initialize properly." << std::endl;
-		system("pause");
+		Utility::Log("GLFW did not initialize properly.");
 		return false;
 	}
 
 	if (!glfwVulkanSupported())
 	{
-		std::cout << "Vulkan is not supported by your graphics card." << std::endl;
-		system("pause");
+		Utility::Log("Vulkan is not supported by your graphics card.");
 		return false;
 	}
 
@@ -62,12 +61,13 @@ bool Screen::Initialize()
 	
 	if (!window)
 	{
-		std::cout << "Application window could not be created." << std::endl;
-		system("pause");
+		Utility::Log("Application window could not be created.");
 		glfwTerminate();
 		return false;
 	}
 
+	//-----------------------------------------------------------------------------
+	//Create instance
 	//-----------------------------------------------------------------------------
 
 	//The layers and extensions seem to be optional right now as Vulkan still 
@@ -77,12 +77,13 @@ bool Screen::Initialize()
 	std::vector<const char*> layers;
 	layers.emplace_back("VK_LAYER_KHRONOS_validation");
 	
-	//The extensions are used to add extra functionality to Vulkan (similar to OpenGL)
+	//The extensions are used to add extra functionality to Vulkan and 
+	//as such are not part of the Vulkan core API (similar to OpenGL)
 	std::vector<const char*> extensions;
 	extensions.emplace_back("VK_KHR_surface");           //binds the GLFW window to Vulkan
 	extensions.emplace_back("VK_KHR_win32_surface");     //Windows specific 
 	extensions.emplace_back("VK_EXT_debug_utils");       //for debugging 
-	extensions.emplace_back("VK_EXT_debug_report");      //for debugging 
+	//extensions.emplace_back("VK_EXT_debug_report");      //for debugging  (deprecated)
 
 	VkApplicationInfo applicationInfo;
 	
@@ -107,10 +108,53 @@ bool Screen::Initialize()
 
 	if (vkCreateInstance(&instanceCreatInfo, nullptr, &instance) != VK_SUCCESS)
 	{
-		std::cout << "Vulkan instance not created." << std::endl;
-		system("pause");
+		Utility::Log("Vulkan instance not created.");
 		return false;
 	}
+
+	//-----------------------------------------------------------------------
+	// Setup debugging
+	//-----------------------------------------------------------------------
+
+	VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo;
+	
+	messengerCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	messengerCreateInfo.pNext = nullptr;
+	messengerCreateInfo.flags = 0;
+	messengerCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+										  VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+										  VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+										  VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+
+	messengerCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+									  VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+									  VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+
+	messengerCreateInfo.pfnUserCallback = &Utility::OnError;
+	messengerCreateInfo.pUserData = nullptr;
+	
+	//Since this is an extension of core Vulkan, we need to get the function address 
+	auto vkCreateDebugUtilsMessenger = 
+	(PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+	
+	if (!vkCreateDebugUtilsMessenger) 
+	{
+		Utility::Log("Cannot find address of 'vkCreateDebugUtilsMessenger'");
+		return false;
+	}
+
+	if (vkCreateDebugUtilsMessenger(instance, &messengerCreateInfo, nullptr, &Utility::debugger) != VK_SUCCESS)
+	{
+		Utility::Log("Error creating Vulkan debugger");
+		return false;
+	}
+	
+
+	
+	
+	
+	
+	//-----------------------------------------------------------------------
 
 	//resolution.x = std::stoi(dataMap["Width"]);
 	//resolution.y = std::stoi(dataMap["Height"]);
@@ -146,6 +190,17 @@ void Screen::Present() const
 void Screen::Shutdown() const
 {
 	glfwTerminate();
+
+	auto vkDestroyDebugUtilsMessenger =
+	(PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+
+	if (!vkDestroyDebugUtilsMessenger)
+	{
+		Utility::Log("Cannot find address of 'vkDestroyDebugUtilsMessenger'");
+		//return false;
+	}
+
+	vkDestroyDebugUtilsMessenger(instance, Utility::debugger, nullptr);
 
 	vkDestroyInstance(instance, nullptr);
 }
