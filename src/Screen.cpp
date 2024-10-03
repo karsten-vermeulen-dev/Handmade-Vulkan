@@ -50,6 +50,9 @@ bool Screen::Initialize()
 		std::cout << "Vulkan is not supported by your graphics card." << std::endl;
 	}
 
+	//This is a Vulkan app, so switch OpenGL support off completely
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
 	window = glfwCreateWindow(1280, 720, "Handmade Vulkan", nullptr, nullptr);
 	
 	if (!window)
