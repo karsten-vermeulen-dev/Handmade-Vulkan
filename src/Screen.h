@@ -2,10 +2,8 @@
 #include <map>
 #include <string>
 
-//#define GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN
 #include <glfw3.h>
-
-//#include <vulkan.h>
 
 class Screen
 {
@@ -18,7 +16,7 @@ public:
 
 	static bool IsWindowResized();
 
-	bool Initialize(const std::string& filename);
+	bool Initialize();
 
 	void Refresh() const;
 	void Present() const;

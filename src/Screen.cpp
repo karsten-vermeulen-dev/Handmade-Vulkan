@@ -36,29 +36,21 @@ void Screen::WindowResizeCallback(GLFWwindow* window, int width, int height)
 }
 
 //======================================================================================================
-bool Screen::Initialize(const std::string& filename)
+bool Screen::Initialize()
 {
-	std::map<std::string, std::string> dataMap;
-
+	
 	if (glfwInit() == GLFW_FALSE)
 	{
 		std::cout << "GLFW did not initialize properly." << std::endl;
 		return false;
 	}
 
-	int profile = std::stoi(dataMap["Core"]) == 1 ? GLFW_OPENGL_CORE_PROFILE
-		: GLFW_OPENGL_COMPAT_PROFILE;
+	if (!glfwVulkanSupported())
+	{
+		std::cout << "Vulkan is not supported by your graphics card." << std::endl;
+	}
 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, profile);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, std::stoi(dataMap["Major"]));
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, std::stoi(dataMap["Minor"]));
-
-	
-
-	window = glfwCreateWindow(std::stoi(dataMap["Width"]),
-							  std::stoi(dataMap["Height"]),
-							  dataMap["Name"].c_str(), 
-		                      nullptr, nullptr);
+	window = glfwCreateWindow(1280, 720, "Handmade Vulkan", nullptr, nullptr);
 	
 	if (!window)
 	{
@@ -71,7 +63,6 @@ bool Screen::Initialize(const std::string& filename)
 	glfwMakeContextCurrent(window);
 	
 
-	
 	//resolution.x = std::stoi(dataMap["Width"]);
 	//resolution.y = std::stoi(dataMap["Height"]);
 	
