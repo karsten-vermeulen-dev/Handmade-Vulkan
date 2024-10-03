@@ -6,9 +6,12 @@ int main()
 {
 	bool isAppRunning{ true };
 
+	if (!Screen::Instance()->Initialize())
+	{
+		return 0;
+	}
+	
 	std::cout << "Hello Vulkan!" << std::endl;
-
-	Screen::Instance()->Initialize();
 
 	while (isAppRunning)
 	{

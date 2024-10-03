@@ -37,4 +37,8 @@ private:
 	
 	GLFWwindow* window{ nullptr };
 
+	//The interface between the application and the hardware/devices
+	//Similar to the older OpenGL context/state machine but more robust
+	VkInstance instance{ nullptr };
+
 };
