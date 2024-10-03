@@ -19,4 +19,5 @@ target_include_directories(Handmade PRIVATE ${CMAKE_SOURCE_DIR}/src/GLFW)
 target_include_directories(Handmade PRIVATE ${CMAKE_SOURCE_DIR}/src/Vulkan)
 
 target_link_libraries(Handmade 
-${CMAKE_SOURCE_DIR}/lib/glfw3.lib)
+${CMAKE_SOURCE_DIR}/lib/glfw3.lib
+${CMAKE_SOURCE_DIR}/lib/vulkan-1.lib)
