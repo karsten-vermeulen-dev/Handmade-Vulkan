@@ -16,5 +16,7 @@ int main()
 		isAppRunning = !Screen::IsXClicked();
 	}
 
+	Screen::Instance()->Shutdown();
+
 	return 0;
 }
