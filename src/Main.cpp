@@ -9,7 +9,8 @@ int main()
 
 	if (!Screen::Instance()->Initialize())
 	{
-		Utility::Log("Application did not initialize properly.");
+		Utility::Log("Application did not initialize properly. Shutting down...");
+		Screen::Instance()->Shutdown();
 		system("pause");
 		return 0;
 	}
